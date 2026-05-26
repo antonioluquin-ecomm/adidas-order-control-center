@@ -11,14 +11,14 @@
  * @returns {Object[]} Array de pedidos consolidados con estados normalizados
  */
 function consolidateOrders(pimRows, vtexRows, tmsRows) {
-  var pimIndex = buildIndex(pimRows,  CONFIG.columns.pim.orderId);
-  var tmsIndex = buildIndex(tmsRows,  CONFIG.columns.tms.orderId);
+  var pimIndex = buildIndex(pimRows, CONFIG.columns.pim.orderId);
+  var tmsIndex = buildIndex(tmsRows, CONFIG.columns.tms.orderId);
 
   var result = [];
 
   for (var i = 0; i < vtexRows.length; i++) {
     var vtexRow = vtexRows[i];
-    var orderId  = String(vtexRow[CONFIG.columns.vtex.orderId] || '').trim();
+    var orderId = trimStr(vtexRow[CONFIG.columns.vtex.orderId]); // #5 trim defensivo
 
     if (!orderId) continue;
 
@@ -29,16 +29,16 @@ function consolidateOrders(pimRows, vtexRows, tmsRows) {
       orderId: orderId,
 
       pim: pimRow ? {
-        status: normalizePimStatus(String(pimRow[CONFIG.columns.pim.status] || ''))
+        status: normalizePimStatus(trimStr(pimRow[CONFIG.columns.pim.status]))
       } : null,
 
       vtex: {
-        status:    normalizeVtexStatus(String(vtexRow[CONFIG.columns.vtex.status] || '')),
+        status:    normalizeVtexStatus(trimStr(vtexRow[CONFIG.columns.vtex.status])),
         delivered: normalizeVtexDelivered(vtexRow[CONFIG.columns.vtex.delivered])
       },
 
       tms: tmsRow ? {
-        status: normalizeTmsStatus(String(tmsRow[CONFIG.columns.tms.status] || ''))
+        status: normalizeTmsStatus(trimStr(tmsRow[CONFIG.columns.tms.status]))
       } : null,
 
       // Rellenados por rules-engine.gs en el paso siguiente
@@ -57,8 +57,8 @@ function consolidateOrders(pimRows, vtexRows, tmsRows) {
 
 /**
  * Construye un índice { orderId → fila } a partir de un array de filas.
+ * Aplica trimStr a la clave para evitar falsos negativos por espacios. (#5)
  * Si hay orderIds duplicados, conserva la primera aparición y loguea el conflicto.
- * (Caso posible en PIM cuando un pedido tiene múltiples SKUs.)
  *
  * @param {Object[]} rows      - Array de objetos fila
  * @param {string}   keyColumn - Nombre de la columna que actúa como clave
@@ -67,7 +67,7 @@ function consolidateOrders(pimRows, vtexRows, tmsRows) {
 function buildIndex(rows, keyColumn) {
   var index = {};
   for (var i = 0; i < rows.length; i++) {
-    var key = String(rows[i][keyColumn] || '').trim();
+    var key = trimStr(rows[i][keyColumn]); // #5 trim defensivo
     if (!key) continue;
     if (index[key]) {
       log('WARN: orderId duplicado en columna "' + keyColumn + '": ' + key + ' — se conserva la primera aparición');

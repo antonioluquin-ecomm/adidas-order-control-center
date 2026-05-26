@@ -37,6 +37,17 @@ function arrayToObjectsByHeader(data) {
 }
 
 /**
+ * Normaliza un valor a string limpio: convierte a String, aplica trim.
+ * Devuelve '' si el valor es null/undefined.
+ * Usar para leer valores de columna antes de comparar o indexar.
+ * @param {*} val
+ * @returns {string}
+ */
+function trimStr(val) {
+  return String(val !== null && val !== undefined ? val : '').trim();
+}
+
+/**
  * Logger centralizado. Usar en lugar de Logger.log() directamente.
  * @param {string} message
  */

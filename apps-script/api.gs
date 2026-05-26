@@ -27,18 +27,17 @@ function doGet(e) {
       }
     }
 
-    // Caché miss (o refresh forzado) — ejecutar pipeline completo
+    // Caché miss — ejecutar pipeline completo
     log('doGet CACHE MISS — ejecutando pipeline');
 
-    var sources = readAllSources();
+    var sources = readAllSources();                                    // #6 fuentes disponibles
     var orders  = consolidateOrders(sources.pim, sources.vtex, sources.tms);
     applyRulesToAll(orders);
-    var meta    = buildMeta(orders);
+    var meta    = buildMeta(orders, sources);                          // #2 #6 byAction + sources
 
     var response = { orders: orders, meta: meta };
     var json     = JSON.stringify(response);
 
-    // Guardar en caché (límite 100 KB; si excede, se salta silenciosamente)
     try {
       cache.put(CACHE_KEY, json, CACHE_TTL);
     } catch (cacheErr) {
@@ -60,15 +59,35 @@ function doGet(e) {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function buildMeta(orders) {
+/**
+ * Calcula totales y desgloses para el meta del response.
+ * #2 — agrega byAction para KPIs por tipo de acción
+ * #6 — agrega sources para validación de fuentes vacías en el frontend
+ *
+ * @param {Object[]} orders
+ * @param {{ pim: Object[], vtex: Object[], tms: Object[] }} sources
+ * @returns {Object}
+ */
+function buildMeta(orders, sources) {
   var byPriority = { Alta: 0, Media: 0, Baja: 0 };
+  var byAction   = {};
+
   for (var i = 0; i < orders.length; i++) {
     var p = orders[i].priority;
+    var a = orders[i].action || 'Sin acción';
     if (p && byPriority.hasOwnProperty(p)) byPriority[p]++;
+    byAction[a] = (byAction[a] || 0) + 1;
   }
+
   return {
     total:      orders.length,
     byPriority: byPriority,
+    byAction:   byAction,                                              // #2
+    sources: {                                                         // #6
+      pim:  sources ? sources.pim.length  : null,
+      vtex: sources ? sources.vtex.length : null,
+      tms:  sources ? sources.tms.length  : null
+    },
     timestamp:  new Date().toISOString()
   };
 }
