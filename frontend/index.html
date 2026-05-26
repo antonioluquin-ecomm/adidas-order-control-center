@@ -53,10 +53,11 @@
 
   <!-- Filtros sticky -->
   <section id="filters">
+    <!-- Fila 1: búsqueda + prioridad + responsable + acciones -->
     <div class="filter-bar">
-      <input  type="search" id="search-input"
-              placeholder="Buscar por Order ID…" class="filter-search">
-      <select id="filter-priority"    class="filter-select">
+      <input type="search" id="search-input"
+             placeholder="Buscar por Order ID…" class="filter-search">
+      <select id="filter-priority" class="filter-select">
         <option value="">Todas las prioridades</option>
         <option value="Alta">Alta</option>
         <option value="Media">Media</option>
@@ -69,10 +70,39 @@
         <option value="Adidas">Adidas</option>
       </select>
       <span id="filter-count" class="filter-count"></span>
-
-      <!-- #4 Exportar CSV -->
       <button class="btn-secondary" onclick="App.exportCSV()">Exportar CSV</button>
       <button id="btn-refresh" class="btn-primary" onclick="App.load(true)">Actualizar datos</button>
+    </div>
+    <!-- Fila 2: estado por fuente + acción sugerida + guía -->
+    <div class="filter-bar filter-bar--states">
+      <select id="filter-pim" class="filter-select">
+        <option value="">PIM: todos</option>
+        <option value="ACTIVO">ACTIVO</option>
+        <option value="FACTURADO">FACTURADO</option>
+        <option value="COLA_FACTURACION">COLA FACTURACIÓN</option>
+        <option value="DESPACHADO">DESPACHADO</option>
+      </select>
+      <select id="filter-vtex" class="filter-select">
+        <option value="">VTEX: todos</option>
+        <option value="FACTURADO">FACTURADO</option>
+        <option value="CANCELADO">CANCELADO</option>
+        <option value="PAGAMENTO_APROBADO">PAGO APROBADO</option>
+      </select>
+      <select id="filter-delivered" class="filter-select">
+        <option value="">Entregado VTEX: todos</option>
+        <option value="true">Sí</option>
+        <option value="false">No</option>
+      </select>
+      <select id="filter-tms" class="filter-select">
+        <option value="">TMS: todos</option>
+        <option value="ENTREGADO">ENTREGADO</option>
+        <option value="EN_TRANSITO">EN TRÁNSITO</option>
+        <option value="NO_ENTREGADO">NO ENTREGADO</option>
+      </select>
+      <select id="filter-action" class="filter-select filter-select--wide">
+        <option value="">Acción: todas</option>
+      </select>
+      <button class="btn-guide" onclick="App.openGuide()">? Guía de acciones</button>
     </div>
   </section>
 
@@ -88,7 +118,7 @@
           <th>Order ID</th>
           <th>PIM</th>
           <th>VTEX</th>
-          <th>Entregado</th>
+          <th title="Delivered en VTEX — debe coincidir con Estado TMS">Entregado VTEX</th>
           <th>TMS</th>
           <th>Acción sugerida</th>
           <th>Responsable</th>
@@ -98,6 +128,17 @@
       <tbody id="orders-tbody"></tbody>
     </table>
   </main>
+
+  <!-- Modal guía de acciones -->
+  <div id="guide-overlay" class="guide-overlay" onclick="App.closeGuide()" style="display:none">
+    <div class="guide-modal" onclick="event.stopPropagation()">
+      <div class="guide-header">
+        <span class="guide-title">Guía de acciones operativas</span>
+        <button class="guide-close" onclick="App.closeGuide()">✕</button>
+      </div>
+      <div class="guide-body" id="guide-body"></div>
+    </div>
+  </div>
 
   <script src="js/api.js"></script>
   <script src="js/dashboard.js"></script>

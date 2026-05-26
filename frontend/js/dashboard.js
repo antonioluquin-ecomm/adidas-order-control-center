@@ -31,7 +31,7 @@ App.renderDashboard = function (meta) {
   App.renderSourceWarnings(meta.sources);
 };
 
-// #2 — Desglose de acciones en la segunda barra del dashboard
+// Chips de acción — clickeables para filtrar la tabla directamente.
 App.renderActionChips = function (byAction) {
   var el = document.getElementById('action-chips');
   if (!el) return;
@@ -40,20 +40,29 @@ App.renderActionChips = function (byAction) {
   var actions = Object.keys(byAction).filter(function (k) { return k !== 'Sin acción'; });
 
   actions.forEach(function (action) {
-    html += '<span class="action-chip">' +
+    var safe = action.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    html += '<span class="action-chip" onclick="App.filterByAction(\'' + safe + '\')" title="Filtrar por esta acción">' +
             '<span class="action-chip-label">' + action + '</span>' +
             '<span class="action-chip-count">'  + byAction[action] + '</span>' +
             '</span>';
   });
 
-  if (byAction['Sin acción']) {
-    html += '<span class="action-chip action-chip--muted">' +
-            '<span class="action-chip-label">Sin acción</span>' +
-            '<span class="action-chip-count">' + byAction['Sin acción'] + '</span>' +
-            '</span>';
-  }
-
   el.innerHTML = html || '<span class="action-chip--empty">Sin acciones pendientes ✓</span>';
+};
+
+// Filtra la tabla por una acción específica al hacer clic en un chip.
+App.filterByAction = function (action) {
+  App.state.filters.action = action;
+  var el = document.getElementById('filter-action');
+  if (el) el.value = action;
+
+  var filtered = App.applyFilters(App.state.orders, App.state.filters);
+  App.renderTable(filtered);
+  App.updateFilterCount(filtered.length, App.state.orders.length);
+
+  // Scroll a la tabla para que el operador vea los resultados
+  var tableContainer = document.getElementById('table-container');
+  if (tableContainer) tableContainer.scrollIntoView({ behavior: 'smooth' });
 };
 
 // #6 — Warning si alguna fuente tiene 0 filas
