@@ -259,6 +259,8 @@ tbody tr:hover td { background: #fafafa; }
   font-size: 14px;
 }
 
+.loading-state--error { color: var(--color-priority-alta); }
+
 @keyframes occ-spin { to { transform: rotate(360deg); } }
 
 .loading-state--spinner::before {
