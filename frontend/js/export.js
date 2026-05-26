@@ -10,7 +10,7 @@ App.exportCSV = function () {
     return;
   }
 
-  var headers = ['Order ID', 'PIM', 'VTEX', 'Entregado', 'TMS', 'Accion', 'Responsable', 'Prioridad'];
+  var headers = ['Order ID', 'PIM', 'VTEX', 'Entregado VTEX', 'TMS', 'Acción', 'Responsable', 'Prioridad'];
 
   var rows = orders.map(function (o) {
     return [

@@ -23,7 +23,7 @@ App.renderTable = function (orders) {
     var o = orders[i];
     html += '<tr class="' + App.priorityRowClass(o.priority) + '">';
     html += '<td class="col-orderid">' + o.orderId + '</td>';
-    html += '<td>' + App.statusBadge(o.pim  ? o.pim.status        : null) + '</td>';
+    html += '<td>' + (o.pim ? App.statusBadge(o.pim.status) : '<span class="badge badge--sin-registro">SIN REG.</span>') + '</td>';
     html += '<td>' + App.statusBadge(o.vtex ? o.vtex.status       : null) + '</td>';
     html += '<td>' + App.deliveredBadge(o.vtex ? o.vtex.delivered : null) + '</td>';
     html += '<td>' + App.statusBadge(o.tms  ? o.tms.status        : null) + '</td>';

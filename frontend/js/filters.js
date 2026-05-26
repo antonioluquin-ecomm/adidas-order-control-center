@@ -25,6 +25,9 @@ App.initFilters = function () {
     var filtered = App.applyFilters(App.state.orders, App.state.filters);
     App.renderTable(filtered);
     App.updateFilterCount(filtered.length, App.state.orders.length);
+    App.updateResetButton();
+    // Re-render chips para reflejar si la acción activa cambió desde el select
+    if (App._lastMeta && App._lastMeta.byAction) App.renderActionChips(App._lastMeta.byAction);
   }
 
   // Expuesto para que los chips del dashboard puedan triggear el filtro

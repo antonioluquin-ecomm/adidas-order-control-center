@@ -102,7 +102,10 @@
       <select id="filter-action" class="filter-select filter-select--wide">
         <option value="">Acción: todas</option>
       </select>
-      <button class="btn-guide" onclick="App.openGuide()">? Guía de acciones</button>
+      <div class="filter-end">
+        <button id="btn-reset" class="btn-reset" onclick="App.resetFilters()" style="display:none">✕ Limpiar</button>
+        <button class="btn-guide" onclick="App.openGuide()">? Guía de acciones</button>
+      </div>
     </div>
   </section>
 

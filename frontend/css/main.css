@@ -99,12 +99,17 @@ body {
 }
 .action-chip--empty { font-size: 11px; color: #3a7d44; cursor: default; }
 
-/* Separador visual entre chips */
-.action-chip + .action-chip::before {
-  content: '·';
-  color: #333;
-  margin-right: 16px;
+.action-chip--active {
+  background: #fff !important;
+  border-radius: 3px;
 }
+.action-chip--active .action-chip-label { color: #000; }
+.action-chip--active .action-chip-count { background: #000; color: #fff; }
+
+.action-chip--alerta .action-chip-label { color: #ffcc80; }
+.action-chip--alerta .action-chip-count { background: #6d3200; }
+
+/* separador eliminado — el gap de #action-chips ya lo maneja */
 
 /* ── Warning fuentes vacías (#6) ─────────────────────────────────────────── */
 .source-warnings {
@@ -158,6 +163,32 @@ body {
 
 .filter-count { margin-left: auto; font-size: 11px; color: #9e9e9e; white-space: nowrap; }
 
+/* Agrupador derecho de la segunda fila de filtros */
+.filter-end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Botón limpiar filtros */
+.btn-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: transparent;
+  color: var(--color-priority-alta);
+  border: 1px solid var(--color-priority-alta);
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: var(--font-base);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-reset:hover { background: var(--color-priority-alta); color: #fff; }
+
 /* Botón de guía */
 .btn-guide {
   padding: 4px 10px;
@@ -169,7 +200,6 @@ body {
   font-family: var(--font-base);
   cursor: pointer;
   white-space: nowrap;
-  margin-left: auto;
   transition: border-color 0.15s, color 0.15s;
 }
 .btn-guide:hover { border-color: #999; color: #000; }
@@ -274,7 +304,8 @@ tbody tr:hover td { background: #fafafa; }
 .badge--adidas      { background: #212121; color: #ffffff; }
 
 /* Sin dato */
-.badge--null { background: #f5f5f5; color: #bdbdbd; }
+.badge--null        { background: #f5f5f5; color: #bdbdbd; }
+.badge--sin-registro { background: #fff3cd; color: #7d5a00; }
 
 /* ── Estados de UI ──────────────────────────────────────────────────────── */
 .loading-state,

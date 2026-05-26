@@ -2,7 +2,8 @@
 var App = window.App || {};
 
 App.state = {
-  orders:  [],
+  orders:    [],
+  isLoading: false,
   filters: {
     search: '', priority: '', responsible: '',
     pim: '', vtex: '', delivered: '', tms: '', action: ''
@@ -15,9 +16,23 @@ App.init = function () {
   App.initFilters();
   App.renderGuide();
   App.load(false);
+
+  // Shortcuts: / → foco en búsqueda, Esc → cerrar modal
+  document.addEventListener('keydown', function (e) {
+    var tag = document.activeElement ? document.activeElement.tagName : '';
+    if (e.key === '/' && tag !== 'INPUT' && tag !== 'SELECT' && tag !== 'TEXTAREA') {
+      e.preventDefault();
+      var s = document.getElementById('search-input');
+      if (s) s.focus();
+    }
+    if (e.key === 'Escape') App.closeGuide();
+  });
 };
 
 App.load = function (forceRefresh) {
+  if (App.state.isLoading) return; // evita múltiples requests en paralelo
+  App.state.isLoading = true;
+
   var loading = document.getElementById('loading');
   var btn     = document.getElementById('btn-refresh');
 
@@ -31,12 +46,14 @@ App.load = function (forceRefresh) {
 
   App.fetchOrders(forceRefresh)
     .then(function (data) {
-      App.state.orders = data.orders || [];
-      App.renderDashboard(data.meta || {});
-      App.populateActionFilter(data.meta ? data.meta.byAction || {} : {});
+      App.state.orders = Array.isArray(data.orders) ? data.orders : [];
+      var meta = data.meta || {};
+      App.renderDashboard(meta);
+      App.populateActionFilter(meta.byAction || {});
       var filtered = App.applyFilters(App.state.orders, App.state.filters);
       App.renderTable(filtered);
       App.updateFilterCount(filtered.length, App.state.orders.length);
+      App.updateResetButton();
       if (btn) { btn.disabled = false; btn.textContent = 'Actualizar datos'; }
     })
     .catch(function (err) {
@@ -46,7 +63,39 @@ App.load = function (forceRefresh) {
         loading.textContent = '⚠  ' + err.message;
       }
       if (btn) { btn.disabled = false; btn.textContent = 'Reintentar'; }
-    });
+    })
+    .then(function () { App.state.isLoading = false; }); // finally con .then para compat IE11
+};
+
+// Muestra u oculta el botón de limpiar según si hay algún filtro activo.
+App.updateResetButton = function () {
+  var btn = document.getElementById('btn-reset');
+  if (!btn) return;
+  var active = Object.keys(App.state.filters).some(function (k) {
+    return App.state.filters[k] !== '';
+  });
+  btn.style.display = active ? 'inline-flex' : 'none';
+};
+
+// Limpia todos los filtros y resetea los elementos del DOM.
+App.resetFilters = function () {
+  var ids = ['search-input', 'filter-priority', 'filter-responsible',
+             'filter-pim', 'filter-vtex', 'filter-delivered', 'filter-tms', 'filter-action'];
+  ids.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  App.state.filters = { search: '', priority: '', responsible: '',
+                        pim: '', vtex: '', delivered: '', tms: '', action: '' };
+
+  // Re-renderizar chips sin estado activo
+  if (App._lastMeta && App._lastMeta.byAction) App.renderActionChips(App._lastMeta.byAction);
+
+  var filtered = App.applyFilters(App.state.orders, App.state.filters);
+  App.renderTable(filtered);
+  App.updateFilterCount(filtered.length, App.state.orders.length);
+  App.updateResetButton();
 };
 
 // Puebla el select de acciones con los valores reales del dataset.
