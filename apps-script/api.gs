@@ -3,27 +3,50 @@
 // Deploy: Ejecutar como "Yo" — Acceso: "Cualquier usuario"
 // URL resultante → pegar en frontend/js/api.js (App.API_URL)
 
+var CACHE_KEY = 'occ_orders_v1';
+var CACHE_TTL = 300; // segundos — 5 minutos
+
 /**
  * Punto de entrada HTTP GET.
- * Pipeline: leer hojas → consolidar → aplicar reglas → responder JSON
+ * Parámetros opcionales:
+ *   ?refresh=1  →  invalida el caché y recalcula (usar después de pegar exports nuevos)
+ *
+ * Pipeline: caché → leer hojas → consolidar → aplicar reglas → responder JSON
  */
 function doGet(e) {
   try {
-    // 1. Leer las tres fuentes desde Google Sheets
+    var forceRefresh = e && e.parameter && e.parameter.refresh === '1';
+    var cache        = CacheService.getScriptCache();
+
+    // Intentar servir desde caché
+    if (!forceRefresh) {
+      var cached = cache.get(CACHE_KEY);
+      if (cached) {
+        log('doGet CACHE HIT');
+        return jsonResponse(JSON.parse(cached));
+      }
+    }
+
+    // Caché miss (o refresh forzado) — ejecutar pipeline completo
+    log('doGet CACHE MISS — ejecutando pipeline');
+
     var sources = readAllSources();
-
-    // 2. Consolidar pedidos por orderId (VTEX como fuente primaria)
-    var orders = consolidateOrders(sources.pim, sources.vtex, sources.tms);
-
-    // 3. Aplicar reglas operativas
+    var orders  = consolidateOrders(sources.pim, sources.vtex, sources.tms);
     applyRulesToAll(orders);
+    var meta    = buildMeta(orders);
 
-    // 4. Calcular meta
-    var meta = buildMeta(orders);
+    var response = { orders: orders, meta: meta };
+    var json     = JSON.stringify(response);
+
+    // Guardar en caché (límite 100 KB; si excede, se salta silenciosamente)
+    try {
+      cache.put(CACHE_KEY, json, CACHE_TTL);
+    } catch (cacheErr) {
+      log('WARN: respuesta demasiado grande para caché (' + cacheErr.message + ')');
+    }
 
     log('doGet OK — ' + orders.length + ' pedidos devueltos');
-
-    return jsonResponse({ orders: orders, meta: meta });
+    return jsonResponse(response);
 
   } catch (err) {
     log('ERROR en doGet: ' + err.message);
@@ -37,19 +60,12 @@ function doGet(e) {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-/**
- * Calcula los totales de meta a partir del array de pedidos consolidados.
- * @param {Object[]} orders
- * @returns {Object}
- */
 function buildMeta(orders) {
   var byPriority = { Alta: 0, Media: 0, Baja: 0 };
-
   for (var i = 0; i < orders.length; i++) {
     var p = orders[i].priority;
     if (p && byPriority.hasOwnProperty(p)) byPriority[p]++;
   }
-
   return {
     total:      orders.length,
     byPriority: byPriority,
@@ -57,11 +73,6 @@ function buildMeta(orders) {
   };
 }
 
-/**
- * Serializa un objeto a JSON y lo devuelve como respuesta ContentService.
- * @param {Object} data
- * @returns {ContentService.TextOutput}
- */
 function jsonResponse(data) {
   return ContentService
     .createTextOutput(JSON.stringify(data))
