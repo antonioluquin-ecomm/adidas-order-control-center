@@ -116,6 +116,36 @@ var RULES = [
     action:      'SOLICITAR: Estado Entregado',
     responsible: 'Adidas',
     priority:    'Media'
+  },
+
+  // ── COLA_FACTURACION: complemento ─────────────────────────────────────────
+
+  // #14 — Espejo de regla #3: VTEX canceló mientras PIM estaba en cola
+  {
+    pim: 'COLA_FACTURACION', vtex: 'CANCELADO', delivered: null, tms: null,
+    action:      'CERRAR: PIM → Baja',
+    responsible: 'Equipo PIM',
+    priority:    'Alta'
+  },
+
+  // ── PIM AUSENTE: pedidos en VTEX sin registro en PIM ──────────────────────
+  // 'AUSENTE' es el valor que toma pimStatus cuando order.pim === null.
+  // Las reglas anteriores usan pim: 'ACTIVO' etc. — nunca null — así que
+  // estas reglas no colisionan con ninguna existente.
+
+  // #15 — Facturado en VTEX sin tracking en PIM → brecha de trazabilidad
+  {
+    pim: 'AUSENTE', vtex: 'FACTURADO', delivered: null, tms: null,
+    action:      'ALERTA: Pedido facturado sin registro en PIM',
+    responsible: 'Equipo PIM',
+    priority:    'Alta'
+  },
+  // #16 — Pago aprobado en VTEX sin registro en PIM → orden activa sin seguimiento
+  {
+    pim: 'AUSENTE', vtex: 'PAGAMENTO_APROBADO', delivered: null, tms: null,
+    action:      'ALERTA: Pedido activo sin registro en PIM',
+    responsible: 'Equipo PIM',
+    priority:    'Alta'
   }
 
 ];
@@ -125,10 +155,12 @@ var RULES = [
  * la primera que coincide, o nulls si ninguna aplica.
  */
 function applyRules(order) {
-  var pimStatus  = order.pim  ? order.pim.status     : null;
-  var vtexStatus = order.vtex ? order.vtex.status    : null;
+  // 'AUSENTE' permite escribir reglas que matchean específicamente cuando
+  // una fuente no tiene registro. null en la regla sigue siendo "no importa".
+  var pimStatus  = order.pim  ? order.pim.status     : 'AUSENTE';
+  var vtexStatus = order.vtex ? order.vtex.status    : 'AUSENTE';
   var delivered  = order.vtex ? order.vtex.delivered : null;
-  var tmsStatus  = order.tms  ? order.tms.status     : null;
+  var tmsStatus  = order.tms  ? order.tms.status     : 'AUSENTE';
 
   for (var i = 0; i < RULES.length; i++) {
     var r = RULES[i];

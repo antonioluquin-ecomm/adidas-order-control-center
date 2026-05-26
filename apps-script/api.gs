@@ -30,12 +30,15 @@ function doGet(e) {
     // Caché miss — ejecutar pipeline completo
     log('doGet CACHE MISS — ejecutando pipeline');
 
-    var sources = readAllSources();                                    // #6 fuentes disponibles
-    var orders  = consolidateOrders(sources.pim, sources.vtex, sources.tms);
-    applyRulesToAll(orders);
-    var meta    = buildMeta(orders, sources);                          // #2 #6 byAction + sources
+    var sources   = readAllSources();
+    var allOrders = consolidateOrders(sources.pim, sources.vtex, sources.tms);
+    applyRulesToAll(allOrders);
 
-    var response = { orders: orders, meta: meta };
+    // Solo se devuelven pedidos con acción pendiente — más liviano para caché y frontend
+    var actionable = allOrders.filter(function (o) { return o.action !== null; });
+    var meta       = buildMeta(allOrders, actionable, sources);
+
+    var response = { orders: actionable, meta: meta };
     var json     = JSON.stringify(response);
 
     try {
@@ -44,7 +47,7 @@ function doGet(e) {
       log('WARN: respuesta demasiado grande para caché (' + cacheErr.message + ')');
     }
 
-    log('doGet OK — ' + orders.length + ' pedidos devueltos');
+    log('doGet OK — ' + actionable.length + ' con acción de ' + allOrders.length + ' totales');
     return jsonResponse(response);
 
   } catch (err) {
@@ -60,30 +63,34 @@ function doGet(e) {
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 /**
- * Calcula totales y desgloses para el meta del response.
- * #2 — agrega byAction para KPIs por tipo de acción
- * #6 — agrega sources para validación de fuentes vacías en el frontend
+ * Calcula totales para el meta del response.
+ * total    → pedidos con acción (lo que ve el operador)
+ * totalAll → universo completo del sistema (contexto)
+ * sinAccion→ pedidos sin inconsistencia detectada
  *
- * @param {Object[]} orders
+ * @param {Object[]} allOrders  - todos los pedidos consolidados
+ * @param {Object[]} actionable - solo los que tienen acción asignada
  * @param {{ pim: Object[], vtex: Object[], tms: Object[] }} sources
  * @returns {Object}
  */
-function buildMeta(orders, sources) {
+function buildMeta(allOrders, actionable, sources) {
   var byPriority = { Alta: 0, Media: 0, Baja: 0 };
   var byAction   = {};
 
-  for (var i = 0; i < orders.length; i++) {
-    var p = orders[i].priority;
-    var a = orders[i].action || 'Sin acción';
+  for (var i = 0; i < actionable.length; i++) {
+    var p = actionable[i].priority;
+    var a = actionable[i].action;
     if (p && byPriority.hasOwnProperty(p)) byPriority[p]++;
-    byAction[a] = (byAction[a] || 0) + 1;
+    if (a) byAction[a] = (byAction[a] || 0) + 1;
   }
 
   return {
-    total:      orders.length,
+    total:      actionable.length,
+    totalAll:   allOrders.length,
+    sinAccion:  allOrders.length - actionable.length,
     byPriority: byPriority,
-    byAction:   byAction,                                              // #2
-    sources: {                                                         // #6
+    byAction:   byAction,
+    sources: {
       pim:  sources ? sources.pim.length  : null,
       vtex: sources ? sources.vtex.length : null,
       tms:  sources ? sources.tms.length  : null

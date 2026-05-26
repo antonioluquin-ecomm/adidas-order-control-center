@@ -18,9 +18,13 @@
         <span class="kpi-title">Centro de Control · Pedidos Seller</span>
       </div>
       <div class="kpi-metrics">
-        <div class="kpi-item">
-          <span class="kpi-label">Total</span>
+        <div class="kpi-item kpi-acciones">
+          <span class="kpi-label">Acciones pendientes</span>
           <span class="kpi-value" id="kpi-total">—</span>
+        </div>
+        <div class="kpi-item kpi-sistema">
+          <span class="kpi-label">En sistema</span>
+          <span class="kpi-value" id="kpi-sistema">—</span>
         </div>
         <div class="kpi-item kpi-alta">
           <span class="kpi-label">Prioridad Alta</span>
@@ -32,7 +36,6 @@
         </div>
         <div class="kpi-item">
           <span class="kpi-label">Datos</span>
-          <!-- #9 indicador de frescura -->
           <span class="kpi-value kpi-ts" id="kpi-ts">—</span>
         </div>
       </div>
@@ -65,12 +68,6 @@
         <option value="Ambos equipos">Ambos equipos</option>
         <option value="Adidas">Adidas</option>
       </select>
-      <!-- #1 Toggle solo acciones -->
-      <label class="filter-toggle">
-        <input type="checkbox" id="filter-solo-acciones">
-        Solo con acción pendiente
-      </label>
-
       <span id="filter-count" class="filter-count"></span>
 
       <!-- #4 Exportar CSV -->

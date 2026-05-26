@@ -3,7 +3,7 @@ var App = window.App || {};
 
 App.state = {
   orders:  [],
-  filters: { search: '', priority: '', responsible: '', soloAcciones: false }
+  filters: { search: '', priority: '', responsible: '' }
 };
 
 // initFilters se llama una sola vez al arrancar para no duplicar listeners.
