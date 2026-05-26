@@ -10,23 +10,78 @@
 
   <!-- Dashboard KPIs -->
   <header id="dashboard">
-    <!-- TODO: Etapa 2 — widgets KPI (total, por prioridad, por estado) -->
+    <div class="kpi-brand">
+      <span class="kpi-logo">adidas</span>
+      <span class="kpi-title">Centro de Control · Pedidos Seller</span>
+    </div>
+    <div class="kpi-metrics">
+      <div class="kpi-item">
+        <span class="kpi-label">Total</span>
+        <span class="kpi-value" id="kpi-total">—</span>
+      </div>
+      <div class="kpi-item kpi-alta">
+        <span class="kpi-label">Prioridad Alta</span>
+        <span class="kpi-value" id="kpi-alta">—</span>
+      </div>
+      <div class="kpi-item kpi-media">
+        <span class="kpi-label">Prioridad Media</span>
+        <span class="kpi-value" id="kpi-media">—</span>
+      </div>
+      <div class="kpi-item">
+        <span class="kpi-label">Actualizado</span>
+        <span class="kpi-value kpi-ts" id="kpi-ts">—</span>
+      </div>
+    </div>
   </header>
 
-  <!-- Filtros y búsqueda sticky -->
+  <!-- Filtros sticky -->
   <section id="filters">
-    <!-- TODO: Etapa 2 — filtros por estado / fuente / prioridad + búsqueda por ID -->
+    <div class="filter-bar">
+      <input type="search" id="search-input"
+             placeholder="Buscar por Order ID…"
+             class="filter-search">
+      <select id="filter-priority" class="filter-select">
+        <option value="">Todas las prioridades</option>
+        <option value="Alta">Alta</option>
+        <option value="Media">Media</option>
+        <option value="Baja">Baja</option>
+      </select>
+      <select id="filter-responsible" class="filter-select">
+        <option value="">Todos los responsables</option>
+        <option value="Operaciones">Operaciones</option>
+        <option value="Adidas">Adidas</option>
+      </select>
+      <span id="filter-count" class="filter-count"></span>
+    </div>
   </section>
 
-  <!-- Tabla operativa de pedidos -->
+  <!-- Tabla operativa -->
   <main id="table-container">
-    <!-- TODO: Etapa 2 — tabla con columnas PIM / VTEX / TMS / Acción / Responsable / Prioridad -->
+    <div id="loading" class="loading-state">Cargando pedidos…</div>
+    <div id="empty"   class="empty-state"   style="display:none">
+      Sin resultados para los filtros aplicados.
+    </div>
+    <table id="orders-table" style="display:none">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>PIM</th>
+          <th>VTEX</th>
+          <th>Entregado</th>
+          <th>TMS</th>
+          <th>Acción sugerida</th>
+          <th>Responsable</th>
+          <th>Prioridad</th>
+        </tr>
+      </thead>
+      <tbody id="orders-tbody"></tbody>
+    </table>
   </main>
 
   <script src="js/api.js"></script>
   <script src="js/dashboard.js"></script>
-  <script src="js/filters.js"></script>
   <script src="js/table.js"></script>
+  <script src="js/filters.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
