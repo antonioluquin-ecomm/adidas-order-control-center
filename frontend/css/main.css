@@ -1,0 +1,20 @@
+/* Centro de Control de Pedidos — Adidas Seller */
+
+:root {
+  --color-primary:       #000000;
+  --color-accent:        #e0e0e0;
+  --color-bg:            #f5f5f5;
+  --color-surface:       #ffffff;
+  --color-priority-alta: #d32f2f;
+  --color-priority-media:#f57c00;
+  --color-priority-baja: #388e3c;
+
+  --font-base:      'Arial', sans-serif;
+  --font-size-base: 14px;
+}
+
+/* Reset mínimo */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-base); font-size: var(--font-size-base); background: var(--color-bg); color: var(--color-primary); }
+
+/* TODO: Etapa 2 — layout completo (dashboard fijo, tabla compacta, badges de estado, filtros sticky) */
