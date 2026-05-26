@@ -6,111 +6,114 @@
 //   null  →  "no importa" — equivale al "—" de la tabla de reglas
 //   valor →  debe coincidir exactamente con el estado canónico normalizado
 //
+// Responsables:
+//   'Equipo PIM'    → solo acciones en PIM (agente PIM cambia estado de pedido + estado logístico)
+//   'Ambos equipos' → acciones en PIM y VTEX (ambos equipos deben coordinar)
+//   'Adidas'        → Adidas carga en sus sistemas; llega vía integración a VTEX
+//
 // IMPORTANTE: el orden del array importa — se aplica la primera regla que coincide.
-// Las reglas catch-all (tms: null) deben ir DESPUÉS de las específicas
-// para la misma combinación PIM+VTEX.
 
 var RULES = [
 
   // ── PIM: ACTIVO ────────────────────────────────────────────────────────────
 
-  // #1
+  // #1 — Solo PIM actualiza
   {
     pim: 'ACTIVO', vtex: 'FACTURADO', delivered: true, tms: 'ENTREGADO',
-    action:      "Pasar a 'Facturado' y 'Entregado' en PIM",
-    responsible: 'Operaciones',
+    action:      'ACTUALIZAR: PIM → Facturado + Entregado',
+    responsible: 'Equipo PIM',
     priority:    'Alta'
   },
-  // #2
+  // #2 — PIM actualiza + equipo VTEX actualiza Delivered
   {
     pim: 'ACTIVO', vtex: 'FACTURADO', delivered: false, tms: 'ENTREGADO',
-    action:      "Pasar a 'Entregado' en VTEX + 'Facturado' y 'Entregado' en PIM",
-    responsible: 'Operaciones',
+    action:      'ACTUALIZAR: PIM → Facturado + Entregado · VTEX → Entregado',
+    responsible: 'Ambos equipos',
     priority:    'Alta'
   },
-  // #3
+  // #3 — Solo PIM da de baja
   {
     pim: 'ACTIVO', vtex: 'CANCELADO', delivered: null, tms: null,
-    action:      'Pasar a Baja en PIM',
-    responsible: 'Operaciones',
+    action:      'CERRAR: PIM → Baja',
+    responsible: 'Equipo PIM',
     priority:    'Alta'
   },
-  // #4 — debe ir antes que #6 (catch-all de la misma combinación PIM+VTEX)
+  // #4 — Adidas debe enviarnos factura + estado entregado (impacta en VTEX vía integración)
   {
     pim: 'ACTIVO', vtex: 'PAGAMENTO_APROBADO', delivered: null, tms: 'ENTREGADO',
-    action:      'Solicitar a Adidas factura y estado Entregado',
+    action:      'SOLICITAR: Factura + Estado Entregado',
     responsible: 'Adidas',
     priority:    'Media'
   },
-  // #5 — debe ir antes que #6
+  // #5 — PIM da de baja + equipo VTEX cancela
   {
     pim: 'ACTIVO', vtex: 'PAGAMENTO_APROBADO', delivered: null, tms: 'NO_ENTREGADO',
-    action:      'Baja en PIM + Cancelar pedido en VTEX',
-    responsible: 'Operaciones',
+    action:      'CERRAR: PIM → Baja · VTEX → Cancelado',
+    responsible: 'Ambos equipos',
     priority:    'Alta'
   },
-  // #6 — catch-all: aplica cuando TMS no es ENTREGADO ni NO_ENTREGADO (EN_TRANSITO, sin TMS, etc.)
+  // #6 — catch-all: TMS no es ENTREGADO ni NO_ENTREGADO (EN_TRANSITO, sin TMS, etc.)
   {
     pim: 'ACTIVO', vtex: 'PAGAMENTO_APROBADO', delivered: null, tms: null,
-    action:      'Consultar a Adidas estado para cierre del pedido',
+    action:      'CONSULTAR: Estado para cierre del pedido',
     responsible: 'Adidas',
     priority:    'Media'
   },
 
   // ── PIM: COLA_FACTURACION ──────────────────────────────────────────────────
 
-  // #7
+  // #7 — Solo PIM actualiza
   {
     pim: 'COLA_FACTURACION', vtex: 'FACTURADO', delivered: true, tms: 'ENTREGADO',
-    action:      'Actualizar a Facturado y Entregado en PIM',
-    responsible: 'Operaciones',
+    action:      'ACTUALIZAR: PIM → Facturado + Entregado',
+    responsible: 'Equipo PIM',
     priority:    'Alta'
   },
-  // #8
+  // #8 — PIM actualiza + equipo VTEX actualiza Delivered
   {
     pim: 'COLA_FACTURACION', vtex: 'FACTURADO', delivered: false, tms: 'ENTREGADO',
-    action:      'Actualizar a Facturado en PIM + Entregado en VTEX',
-    responsible: 'Operaciones',
+    action:      'ACTUALIZAR: PIM → Facturado · VTEX → Entregado',
+    responsible: 'Ambos equipos',
     priority:    'Alta'
   },
 
   // ── PIM: DESPACHADO ────────────────────────────────────────────────────────
 
-  // #9
+  // #9 — Solo PIM actualiza
   {
     pim: 'DESPACHADO', vtex: 'FACTURADO', delivered: true, tms: 'ENTREGADO',
-    action:      'Actualizar a Facturado y Entregado en PIM',
-    responsible: 'Operaciones',
+    action:      'ACTUALIZAR: PIM → Facturado + Entregado',
+    responsible: 'Equipo PIM',
     priority:    'Alta'
   },
-  // #10
+  // #10 — Adidas debe enviarnos factura (pega en VTEX vía integración)
   {
     pim: 'DESPACHADO', vtex: 'FACTURADO', delivered: false, tms: 'ENTREGADO',
-    action:      'Adidas debe enviar la factura',
+    action:      'SOLICITAR: Factura',
     responsible: 'Adidas',
     priority:    'Media'
   },
-  // #11
+  // #11 — Solo PIM cierra con Baja + No Entregado (estado pedido + estado logístico)
   {
     pim: 'DESPACHADO', vtex: 'FACTURADO', delivered: null, tms: 'NO_ENTREGADO',
-    action:      'Pasar a Baja y No Entregado en PIM',
-    responsible: 'Operaciones',
+    action:      'CERRAR: PIM → Baja + No Entregado',
+    responsible: 'Equipo PIM',
     priority:    'Alta'
   },
 
   // ── PIM: FACTURADO ─────────────────────────────────────────────────────────
 
-  // #12
+  // #12 — Adidas debe investigar por qué sigue en tránsito
   {
     pim: 'FACTURADO', vtex: 'FACTURADO', delivered: true, tms: 'EN_TRANSITO',
-    action:      'Consultar a Adidas por qué sigue En Tránsito',
+    action:      'CONSULTAR: Por qué sigue En Tránsito',
     responsible: 'Adidas',
     priority:    'Media'
   },
-  // #13
+  // #13 — Adidas debe enviar estado entregado (impacta en VTEX Delivered vía integración)
   {
     pim: 'FACTURADO', vtex: 'FACTURADO', delivered: false, tms: 'ENTREGADO',
-    action:      'Adidas debe enviar estado Entregado',
+    action:      'SOLICITAR: Estado Entregado',
     responsible: 'Adidas',
     priority:    'Media'
   }
@@ -120,9 +123,6 @@ var RULES = [
 /**
  * Evalúa un pedido consolidado contra todas las reglas y retorna
  * la primera que coincide, o nulls si ninguna aplica.
- *
- * @param {Object} order - Pedido consolidado de consolidator.gs
- * @returns {{ action: string|null, responsible: string|null, priority: string|null }}
  */
 function applyRules(order) {
   var pimStatus  = order.pim  ? order.pim.status     : null;
@@ -149,10 +149,6 @@ function applyRules(order) {
 
 /**
  * Aplica las reglas a todos los pedidos consolidados (modifica el array in-place).
- * Loguea el conteo por prioridad para smoke test rápido.
- *
- * @param {Object[]} orders - Array de consolidator.gs
- * @returns {Object[]} El mismo array con action/responsible/priority rellenos
  */
 function applyRulesToAll(orders) {
   var counts = { Alta: 0, Media: 0, Baja: 0, sin_accion: 0 };

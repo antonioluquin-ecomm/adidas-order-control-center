@@ -53,7 +53,11 @@ App.deliveredBadge = function (delivered) {
 
 App.responsibleBadge = function (responsible) {
   if (!responsible) return '<span class="badge badge--null">—</span>';
-  var cls = responsible === 'Adidas' ? 'badge--adidas' : 'badge--operaciones';
+  var cls = {
+    'Equipo PIM':    'badge--equipo-pim',
+    'Ambos equipos': 'badge--ambos',
+    'Adidas':        'badge--adidas'
+  }[responsible] || 'badge--null';
   return '<span class="badge ' + cls + '">' + responsible + '</span>';
 };
 

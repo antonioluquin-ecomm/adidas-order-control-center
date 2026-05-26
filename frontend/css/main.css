@@ -254,7 +254,8 @@ tbody tr:hover td { background: #fafafa; }
 .badge--no-entregado { background: #fbe9e7; color: #bf360c; }
 
 /* Responsable */
-.badge--operaciones { background: #e8eaf6; color: #283593; }
+.badge--equipo-pim  { background: #e8eaf6; color: #283593; }
+.badge--ambos       { background: #ede7f6; color: #4527a0; }
 .badge--adidas      { background: #212121; color: #ffffff; }
 
 /* Sin dato */
