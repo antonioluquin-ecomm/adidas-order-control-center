@@ -94,13 +94,13 @@ var GUIDE_CONTENT = [
     items: [
       {
         action: 'CERRAR: PIM → Baja',
-        cuando: 'El pedido fue cancelado en VTEX. Corresponde dar de baja en PIM.',
-        pasos:  ['En PIM: Estado pedido → Baja']
+        cuando: 'El pedido fue cancelado en VTEX. Solo aplica cuando el pedido en PIM está en estado Activo.',
+        pasos:  ['Pasar a Equipo PIM para dar de Baja']
       },
       {
         action: 'CERRAR: PIM → Baja + No Entregado',
-        cuando: 'Pedido despachado en PIM pero TMS confirma que no se pudo entregar.',
-        pasos:  ['En PIM: Estado pedido → Baja', 'En PIM: Estado logístico → No Entregado']
+        cuando: 'El pedido fue despachado en PIM pero TMS confirma que no se pudo entregar.',
+        pasos:  ['Pasar a Equipo PIM para actualizar el pedido: Estado pedido → Baja, o Estado pedido → Facturado con Estado logístico → No Entregado']
       },
       {
         action: 'CERRAR: PIM → Baja · VTEX → Cancelado',
@@ -120,8 +120,8 @@ var GUIDE_CONTENT = [
       },
       {
         action: 'SOLICITAR: Factura',
-        cuando: 'Pedido entregado confirmado, falta solo la factura de Adidas.',
-        pasos:  ['Contactar a Adidas', 'Solicitar: emisión de factura del pedido']
+        cuando: 'Pedido entregado confirmado, falta la factura de Adidas.',
+        pasos:  ['Contactar a Adidas', 'Solicitar que envíen la factura vía integración a nuestro VTEX']
       },
       {
         action: 'SOLICITAR: Estado Entregado',
