@@ -27,7 +27,7 @@ App.renderTable = function (orders) {
     html += '<td>' + App.statusBadge(o.vtex ? o.vtex.status       : null) + '</td>';
     html += '<td>' + App.deliveredBadge(o.vtex ? o.vtex.delivered : null) + '</td>';
     html += '<td>' + App.statusBadge(o.tms  ? o.tms.status        : null) + '</td>';
-    html += '<td class="col-action">' + (o.action || '<span class="no-action">—</span>') + '</td>';
+    html += '<td class="col-action">' + o.action + '</td>';
     html += '<td>' + App.responsibleBadge(o.responsible) + '</td>';
     html += '<td>' + App.priorityBadge(o.priority) + '</td>';
     html += '</tr>';

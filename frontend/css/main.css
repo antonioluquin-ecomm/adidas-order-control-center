@@ -146,19 +146,6 @@ body {
 .filter-search:focus,
 .filter-select:focus { border-color: var(--color-primary); }
 
-/* #1 Toggle solo acciones */
-.filter-toggle {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-  color: #444;
-}
-.filter-toggle input { cursor: pointer; accent-color: var(--color-primary); }
-
 .filter-count { margin-left: auto; font-size: 11px; color: #9e9e9e; white-space: nowrap; }
 
 /* Botones */

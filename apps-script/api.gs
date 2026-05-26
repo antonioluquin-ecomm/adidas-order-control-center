@@ -3,7 +3,7 @@
 // Deploy: Ejecutar como "Yo" — Acceso: "Cualquier usuario"
 // URL resultante → pegar en frontend/js/api.js (App.API_URL)
 
-var CACHE_KEY = 'occ_orders_v1';
+var CACHE_KEY = 'occ_orders_v2'; // bumpeado al agregar totalAll/sinAccion al contrato
 var CACHE_TTL = 300; // segundos — 5 minutos
 
 /**

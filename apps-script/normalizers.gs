@@ -4,11 +4,17 @@
 
 function normalizePimStatus(raw) {
   var map = {
-    'Activo':              'ACTIVO',
-    'Facturado':           'FACTURADO',
-    'Cola de facturacion': 'COLA_FACTURACION',
-    'Cola de facturación': 'COLA_FACTURACION',
-    'Despachado':          'DESPACHADO'
+    'Activo':                  'ACTIVO',
+    'ACTIVO':                  'ACTIVO',
+    'Facturado':               'FACTURADO',
+    'FACTURADO':               'FACTURADO',
+    'Cola de facturacion':     'COLA_FACTURACION',
+    'Cola de facturación':     'COLA_FACTURACION',
+    'COLA DE FACTURACION':     'COLA_FACTURACION',
+    'COLA DE FACTURACIÓN':     'COLA_FACTURACION',
+    'Cola De Facturacion':     'COLA_FACTURACION',
+    'Despachado':              'DESPACHADO',
+    'DESPACHADO':              'DESPACHADO'
   };
   return map[raw] || String(raw).toUpperCase().replace(/\s+/g, '_');
 }
