@@ -8,39 +8,52 @@
 </head>
 <body>
 
-  <!-- Dashboard KPIs -->
+  <!-- Dashboard: KPIs + chips de acción -->
   <header id="dashboard">
-    <div class="kpi-brand">
-      <span class="kpi-logo">adidas</span>
-      <span class="kpi-title">Centro de Control · Pedidos Seller</span>
+
+    <!-- Fila 1: brand + métricas principales -->
+    <div class="kpi-bar">
+      <div class="kpi-brand">
+        <span class="kpi-logo">adidas</span>
+        <span class="kpi-title">Centro de Control · Pedidos Seller</span>
+      </div>
+      <div class="kpi-metrics">
+        <div class="kpi-item">
+          <span class="kpi-label">Total</span>
+          <span class="kpi-value" id="kpi-total">—</span>
+        </div>
+        <div class="kpi-item kpi-alta">
+          <span class="kpi-label">Prioridad Alta</span>
+          <span class="kpi-value" id="kpi-alta">—</span>
+        </div>
+        <div class="kpi-item kpi-media">
+          <span class="kpi-label">Prioridad Media</span>
+          <span class="kpi-value" id="kpi-media">—</span>
+        </div>
+        <div class="kpi-item">
+          <span class="kpi-label">Datos</span>
+          <!-- #9 indicador de frescura -->
+          <span class="kpi-value kpi-ts" id="kpi-ts">—</span>
+        </div>
+      </div>
     </div>
-    <div class="kpi-metrics">
-      <div class="kpi-item">
-        <span class="kpi-label">Total</span>
-        <span class="kpi-value" id="kpi-total">—</span>
-      </div>
-      <div class="kpi-item kpi-alta">
-        <span class="kpi-label">Prioridad Alta</span>
-        <span class="kpi-value" id="kpi-alta">—</span>
-      </div>
-      <div class="kpi-item kpi-media">
-        <span class="kpi-label">Prioridad Media</span>
-        <span class="kpi-value" id="kpi-media">—</span>
-      </div>
-      <div class="kpi-item">
-        <span class="kpi-label">Actualizado</span>
-        <span class="kpi-value kpi-ts" id="kpi-ts">—</span>
-      </div>
+
+    <!-- Fila 2: desglose por tipo de acción (#2) -->
+    <div class="action-chips-bar">
+      <div id="action-chips"></div>
     </div>
+
   </header>
+
+  <!-- Warning fuentes vacías (#6) -->
+  <div id="source-warnings" class="source-warnings" style="display:none"></div>
 
   <!-- Filtros sticky -->
   <section id="filters">
     <div class="filter-bar">
-      <input type="search" id="search-input"
-             placeholder="Buscar por Order ID…"
-             class="filter-search">
-      <select id="filter-priority" class="filter-select">
+      <input  type="search" id="search-input"
+              placeholder="Buscar por Order ID…" class="filter-search">
+      <select id="filter-priority"    class="filter-select">
         <option value="">Todas las prioridades</option>
         <option value="Alta">Alta</option>
         <option value="Media">Media</option>
@@ -51,17 +64,24 @@
         <option value="Operaciones">Operaciones</option>
         <option value="Adidas">Adidas</option>
       </select>
+      <!-- #1 Toggle solo acciones -->
+      <label class="filter-toggle">
+        <input type="checkbox" id="filter-solo-acciones">
+        Solo con acción pendiente
+      </label>
+
       <span id="filter-count" class="filter-count"></span>
-      <button id="btn-refresh" class="btn-refresh" onclick="App.load(true)">
-        Actualizar datos
-      </button>
+
+      <!-- #4 Exportar CSV -->
+      <button class="btn-secondary" onclick="App.exportCSV()">Exportar CSV</button>
+      <button id="btn-refresh" class="btn-primary" onclick="App.load(true)">Actualizar datos</button>
     </div>
   </section>
 
   <!-- Tabla operativa -->
   <main id="table-container">
     <div id="loading" class="loading-state">Cargando pedidos…</div>
-    <div id="empty"   class="empty-state"   style="display:none">
+    <div id="empty"   class="empty-state" style="display:none">
       Sin resultados para los filtros aplicados.
     </div>
     <table id="orders-table" style="display:none">
@@ -85,6 +105,7 @@
   <script src="js/dashboard.js"></script>
   <script src="js/table.js"></script>
   <script src="js/filters.js"></script>
+  <script src="js/export.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
