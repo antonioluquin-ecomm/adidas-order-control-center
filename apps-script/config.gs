@@ -1,25 +1,53 @@
 // Configuración central: nombres de hojas y columnas por fuente.
-// Columnas verificadas contra archivo "Adidas Order Control Center.xlsx" (2026-05-26).
+// Columnas PIM verificadas contra Google Sheet (2026-05-26, encabezados definitivos).
 
 var CONFIG = {
   sheets: {
     pim:     'Export PIM',
     vtex:    'Export Vtex',
     tms:     'Export TMS',
-    control: 'Control_Acciones',  // creada por el Apps Script si no existe
+    control: 'Control_Acciones',
     rules:   'Reglas_Estados'
   },
   columns: {
     // Clave de join entre los tres sistemas: mismo formato "XXXXXXXXXXXXXXXXX-01"
     pim: {
-      orderId:      'Nro Pedido',    // ej: '1562126737111-01'  ← clave de join
-      idInterno:    'ID Pedido',     // ej: '102153722'
-      status:       'Estado Actual', // ej: 'Activo', 'Facturado'
-      fechaPedido:  'Fecha Pedido',
-      fechaFactura: 'Fecha Factura',
-      producto:     'Producto',
-      cantidad:     'Cantidad',
-      precio:       'PrecioWEB'
+      // ── Identificadores ──────────────────────────────────────────────────
+      orderId:       'Nro Pedido',      // ej: '1562126737111-01' ← clave de join
+      idInterno:     'ID Pedido',       // ej: '102153722'
+
+      // ── Canal y tienda ───────────────────────────────────────────────────
+      canal:         'Canal',
+      tienda:        'Tienda',
+
+      // ── Fechas ───────────────────────────────────────────────────────────
+      fechaPedido:   'Fecha Pedido',
+      fechaAlta:     'Fecha Alta',
+      fechaFactura:  'Fecha Factura',
+      fechaResuelto: 'Fecha Resuelto',
+
+      // ── Logística ────────────────────────────────────────────────────────
+      deposito:      'Depósito',
+      region:        'Región',
+      localidad:     'Localidad',
+
+      // ── Producto ─────────────────────────────────────────────────────────
+      sku:           'Sku',
+      rubro:         'Rubro',
+      disciplina:    'Disciplina',
+      tipo:          'Tipo',
+      seccion:       'Seccion',
+      proveedor:     'Proveedor',
+      producto:      'Producto',
+      cantidad:      'Cantidad',
+      valor:         'Valor',
+      precioPim:     'PrecioPIM',
+      precioWeb:     'PrecioWEB',
+
+      // ── Estado operativo ─────────────────────────────────────────────────
+      status:        'Estado Actual',   // ej: 'Activo', 'Facturado' ← usado en reglas
+      horas:         'Horas',
+      pasos:         'Pasos'
     },
     vtex: {
       orderId:      'Order',         // ej: '1543406522858-01'  ← clave de join
