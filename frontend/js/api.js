@@ -2,7 +2,7 @@
 var App = window.App || {};
 
 App.API_URL     = 'https://script.google.com/macros/s/AKfycbzYzx3JoIFt-Lni6RQmWwT7HFaR_EJ9wiKwlmYsN3pP4USDkpzSOZ__8lrOkpbsTo7d/exec';
-App.FETCH_TIMEOUT = 30000; // ms — Apps Script puede tardar en cold start
+App.FETCH_TIMEOUT = 60000; // ms — Apps Script puede tardar en cold start + cache miss
 
 /**
  * Carga pedidos desde el Apps Script.
