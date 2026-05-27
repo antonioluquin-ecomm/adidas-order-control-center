@@ -133,14 +133,7 @@ var RULES = [
   // Las reglas anteriores usan pim: 'ACTIVO' etc. — nunca null — así que
   // estas reglas no colisionan con ninguna existente.
 
-  // #15 — Facturado en VTEX sin tracking en PIM → brecha de trazabilidad
-  {
-    pim: 'AUSENTE', vtex: 'FACTURADO', delivered: null, tms: null,
-    action:      'ALERTA: Pedido facturado sin registro en PIM',
-    responsible: 'Equipo PIM',
-    priority:    'Alta'
-  },
-  // #16 — Pago aprobado en VTEX sin registro en PIM → orden activa sin seguimiento
+  // #15 — Pago aprobado en VTEX sin registro en PIM → orden activa sin seguimiento
   {
     pim: 'AUSENTE', vtex: 'PAGAMENTO_APROBADO', delivered: null, tms: null,
     action:      'ALERTA: Pedido activo sin registro en PIM',

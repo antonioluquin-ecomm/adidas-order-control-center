@@ -8,8 +8,6 @@ App.renderDashboard = function (meta) {
   // ── KPIs principales ──────────────────────────────────────────────────────
   document.getElementById('kpi-total').textContent   = meta.total    || 0;
   document.getElementById('kpi-sistema').textContent = meta.totalAll || 0;
-  document.getElementById('kpi-alta').textContent    = bp.Alta       || 0;
-  document.getElementById('kpi-media').textContent   = bp.Media      || 0;
 
   // #9 — Indicador de frescura de datos
   var tsEl = document.getElementById('kpi-ts');

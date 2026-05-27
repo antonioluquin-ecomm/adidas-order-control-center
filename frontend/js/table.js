@@ -21,15 +21,15 @@ App.renderTable = function (orders) {
   var html = '';
   for (var i = 0; i < orders.length; i++) {
     var o = orders[i];
-    html += '<tr class="' + App.priorityRowClass(o.priority) + '">';
+    html += '<tr>';
     html += '<td class="col-orderid">' + o.orderId + '</td>';
+    html += '<td class="col-date">' + (o.orderDate || '<span class="badge badge--null">—</span>') + '</td>';
     html += '<td>' + (o.pim ? App.statusBadge(o.pim.status) : '<span class="badge badge--sin-registro">SIN REG.</span>') + '</td>';
     html += '<td>' + App.statusBadge(o.vtex ? o.vtex.status       : null) + '</td>';
     html += '<td>' + App.deliveredBadge(o.vtex ? o.vtex.delivered : null) + '</td>';
     html += '<td>' + App.statusBadge(o.tms  ? o.tms.status        : null) + '</td>';
     html += '<td class="col-action">' + o.action + '</td>';
     html += '<td>' + App.responsibleBadge(o.responsible) + '</td>';
-    html += '<td>' + App.priorityBadge(o.priority) + '</td>';
     html += '</tr>';
   }
   tbody.innerHTML = html;
@@ -61,12 +61,3 @@ App.responsibleBadge = function (responsible) {
   return '<span class="badge ' + cls + '">' + responsible + '</span>';
 };
 
-App.priorityBadge = function (priority) {
-  if (!priority) return '<span class="badge badge--null">—</span>';
-  return '<span class="badge badge--' + priority.toLowerCase() + '">' + priority + '</span>';
-};
-
-App.priorityRowClass = function (priority) {
-  if (!priority) return '';
-  return 'row--' + priority.toLowerCase();
-};

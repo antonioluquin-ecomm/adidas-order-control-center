@@ -4,7 +4,8 @@ var App = window.App || {};
 // initFilters se llama una sola vez al arrancar para no duplicar listeners.
 App.initFilters = function () {
   var searchEl    = document.getElementById('search-input');
-  var priorityEl  = document.getElementById('filter-priority');
+  var yearEl      = document.getElementById('filter-year');
+  var monthEl     = document.getElementById('filter-month');
   var respEl      = document.getElementById('filter-responsible');
   var pimEl       = document.getElementById('filter-pim');
   var vtexEl      = document.getElementById('filter-vtex');
@@ -14,7 +15,8 @@ App.initFilters = function () {
 
   function onChange() {
     App.state.filters.search      = searchEl    ? searchEl.value.trim().toLowerCase() : '';
-    App.state.filters.priority    = priorityEl  ? priorityEl.value  : '';
+    App.state.filters.year        = yearEl      ? yearEl.value      : '';
+    App.state.filters.month       = monthEl     ? monthEl.value     : '';
     App.state.filters.responsible = respEl      ? respEl.value      : '';
     App.state.filters.pim         = pimEl       ? pimEl.value       : '';
     App.state.filters.vtex        = vtexEl      ? vtexEl.value      : '';
@@ -34,7 +36,8 @@ App.initFilters = function () {
   App._onFilterChange = onChange;
 
   if (searchEl)    searchEl.addEventListener('input',    onChange);
-  if (priorityEl)  priorityEl.addEventListener('change', onChange);
+  if (yearEl)      yearEl.addEventListener('change',     onChange);
+  if (monthEl)     monthEl.addEventListener('change',    onChange);
   if (respEl)      respEl.addEventListener('change',     onChange);
   if (pimEl)       pimEl.addEventListener('change',      onChange);
   if (vtexEl)      vtexEl.addEventListener('change',     onChange);
@@ -43,9 +46,16 @@ App.initFilters = function () {
   if (actionEl)    actionEl.addEventListener('change',   onChange);
 };
 
+// Extrae año y mes de un string "dd/MM/yyyy". Devuelve null si no parsea.
+App._parseOrderDateYM = function (dateStr) {
+  if (!dateStr) return null;
+  var parts = dateStr.split('/');
+  if (parts.length === 3) return { year: parts[2], month: String(parseInt(parts[1], 10)) };
+  return null;
+};
+
 App.applyFilters = function (orders, criteria) {
   return orders.filter(function (o) {
-    if (criteria.priority    && o.priority    !== criteria.priority)    return false;
     if (criteria.responsible && o.responsible !== criteria.responsible) return false;
     if (criteria.search      && o.orderId.toLowerCase().indexOf(criteria.search) === -1) return false;
     if (criteria.pim  && (o.pim  ? o.pim.status  : '') !== criteria.pim)  return false;
@@ -55,6 +65,11 @@ App.applyFilters = function (orders, criteria) {
       if ((o.vtex ? String(o.vtex.delivered) : '') !== criteria.delivered) return false;
     }
     if (criteria.action && o.action !== criteria.action) return false;
+    if (criteria.year || criteria.month) {
+      var ym = App._parseOrderDateYM(o.orderDate);
+      if (criteria.year  && (!ym || ym.year  !== criteria.year))  return false;
+      if (criteria.month && (!ym || ym.month !== criteria.month)) return false;
+    }
     return true;
   });
 };

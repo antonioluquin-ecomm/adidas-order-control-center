@@ -10,18 +10,18 @@ App.exportCSV = function () {
     return;
   }
 
-  var headers = ['Order ID', 'PIM', 'VTEX', 'Entregado VTEX', 'TMS', 'Acción', 'Responsable', 'Prioridad'];
+  var headers = ['Order ID', 'Fecha Pedido', 'PIM', 'VTEX', 'Entregado VTEX', 'TMS', 'Acción', 'Responsable'];
 
   var rows = orders.map(function (o) {
     return [
       o.orderId,
+      o.orderDate   || '',
       o.pim  ? o.pim.status        : '',
       o.vtex ? o.vtex.status       : '',
       o.vtex ? (o.vtex.delivered ? 'Si' : 'No') : '',
       o.tms  ? o.tms.status        : '',
       o.action      || '',
-      o.responsible || '',
-      o.priority    || ''
+      o.responsible || ''
     ].map(csvCell).join(',');
   });
 

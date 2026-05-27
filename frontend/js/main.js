@@ -5,7 +5,7 @@ App.state = {
   orders:    [],
   isLoading: false,
   filters: {
-    search: '', priority: '', responsible: '',
+    search: '', year: '', month: '', responsible: '',
     pim: '', vtex: '', delivered: '', tms: '', action: ''
   }
 };
@@ -50,6 +50,7 @@ App.load = function (forceRefresh) {
       var meta = data.meta || {};
       App.renderDashboard(meta);
       App.populateActionFilter(meta.byAction || {});
+      App.populateDateFilters(App.state.orders);
       var filtered = App.applyFilters(App.state.orders, App.state.filters);
       App.renderTable(filtered);
       App.updateFilterCount(filtered.length, App.state.orders.length);
@@ -79,14 +80,14 @@ App.updateResetButton = function () {
 
 // Limpia todos los filtros y resetea los elementos del DOM.
 App.resetFilters = function () {
-  var ids = ['search-input', 'filter-priority', 'filter-responsible',
+  var ids = ['search-input', 'filter-year', 'filter-month', 'filter-responsible',
              'filter-pim', 'filter-vtex', 'filter-delivered', 'filter-tms', 'filter-action'];
   ids.forEach(function (id) {
     var el = document.getElementById(id);
     if (el) el.value = '';
   });
 
-  App.state.filters = { search: '', priority: '', responsible: '',
+  App.state.filters = { search: '', year: '', month: '', responsible: '',
                         pim: '', vtex: '', delivered: '', tms: '', action: '' };
 
   // Re-renderizar chips sin estado activo
@@ -96,6 +97,46 @@ App.resetFilters = function () {
   App.renderTable(filtered);
   App.updateFilterCount(filtered.length, App.state.orders.length);
   App.updateResetButton();
+};
+
+// Puebla los selects de año y mes con los valores presentes en el dataset.
+App.populateDateFilters = function (orders) {
+  var years  = {};
+  var months = {};
+  var MONTH_NAMES = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                         'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+  orders.forEach(function (o) {
+    var ym = App._parseOrderDateYM(o.orderDate);
+    if (!ym) return;
+    years[ym.year]   = true;
+    months[ym.month] = true;
+  });
+
+  var yearEl  = document.getElementById('filter-year');
+  var monthEl = document.getElementById('filter-month');
+
+  if (yearEl) {
+    var curYear = yearEl.value;
+    yearEl.innerHTML = '<option value="">Año: todos</option>';
+    Object.keys(years).sort(function (a, b) { return b - a; }).forEach(function (y) {
+      var opt = document.createElement('option');
+      opt.value = y; opt.textContent = y;
+      yearEl.appendChild(opt);
+    });
+    if (curYear) yearEl.value = curYear;
+  }
+
+  if (monthEl) {
+    var curMonth = monthEl.value;
+    monthEl.innerHTML = '<option value="">Mes: todos</option>';
+    Object.keys(months).map(Number).sort(function (a, b) { return a - b; }).forEach(function (m) {
+      var opt = document.createElement('option');
+      opt.value = String(m); opt.textContent = MONTH_NAMES[m] || m;
+      monthEl.appendChild(opt);
+    });
+    if (curMonth) monthEl.value = curMonth;
+  }
 };
 
 // Puebla el select de acciones con los valores reales del dataset.
@@ -199,11 +240,6 @@ var GUIDE_CONTENT = [
     verb: 'ALERTA',
     color: '#7d5a00',
     items: [
-      {
-        action: 'ALERTA: Pedido facturado sin registro en PIM',
-        cuando: 'El pedido está Facturado en VTEX pero no tiene fila en el export PIM. Brecha de trazabilidad.',
-        pasos:  ['Verificar si el Order ID corresponde a este seller', 'Si corresponde: buscar en PIM manualmente y crear registro si falta', 'Si no corresponde o es error de datos: escalar a soporte técnico']
-      },
       {
         action: 'ALERTA: Pedido activo sin registro en PIM',
         cuando: 'Pago aprobado en VTEX pero el pedido no aparece en PIM. El cliente pagó y no hay seguimiento.',

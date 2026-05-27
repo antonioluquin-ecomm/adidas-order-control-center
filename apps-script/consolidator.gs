@@ -26,7 +26,8 @@ function consolidateOrders(pimRows, vtexRows, tmsRows) {
     var tmsRow = tmsIndex[orderId] || null;
 
     result.push({
-      orderId: orderId,
+      orderId:   orderId,
+      orderDate: pimRow ? formatPimDate(pimRow[CONFIG.columns.pim.fechaPedido]) : '',
 
       pim: pimRow ? {
         status: normalizePimStatus(trimStr(pimRow[CONFIG.columns.pim.status]))
@@ -53,6 +54,21 @@ function consolidateOrders(pimRows, vtexRows, tmsRows) {
       'sin TMS: '  + result.filter(function(o) { return !o.tms; }).length  + ')');
 
   return result;
+}
+
+/**
+ * Formatea un valor de celda de fecha PIM a string "dd/MM/yyyy".
+ * Maneja Date objects (Apps Script) y strings de fallback.
+ */
+function formatPimDate(val) {
+  if (!val) return '';
+  try {
+    var d = val instanceof Date ? val : new Date(val);
+    if (isNaN(d.getTime())) return trimStr(val);
+    return Utilities.formatDate(d, Session.getScriptTimeZone(), 'dd/MM/yyyy');
+  } catch (e) {
+    return trimStr(val);
+  }
 }
 
 /**
