@@ -42,8 +42,9 @@
 
   <!-- Tab bar -->
   <nav id="tab-bar">
-    <button id="tab-operativo" class="tab tab--active" onclick="App.showTab('operativo')">Pedidos</button>
-    <button id="tab-analitica" class="tab" onclick="App.showTab('analitica')">Analítica</button>
+    <button id="tab-operativo"   class="tab tab--active" onclick="App.showTab('operativo')">Pedidos</button>
+    <button id="tab-analitica"   class="tab"             onclick="App.showTab('analitica')">Analítica</button>
+    <button id="tab-instructivo" class="tab"             onclick="App.showTab('instructivo')">Instructivo</button>
   </nav>
 
   <!-- Vista operativa -->
@@ -137,6 +138,76 @@
 
   <!-- Vista analítica -->
   <div id="view-analitica" style="display:none"></div>
+
+  <!-- Vista instructivo -->
+  <div id="view-instructivo" style="display:none">
+    <div class="instructivo-container">
+
+      <h2 class="instructivo-heading">Cómo actualizar los datos</h2>
+      <p class="instructivo-intro">Completá los tres exports y pegá los datos en la base de datos. Luego hacé clic en <strong>Actualizar datos</strong> para reflejar los cambios en la tabla.</p>
+
+      <div class="instructivo-steps">
+
+        <!-- VTEX -->
+        <div class="instructivo-step">
+          <div class="instructivo-step-num">1</div>
+          <div class="instructivo-step-body">
+            <h3 class="instructivo-step-title">Export VTEX</h3>
+            <ol class="instructivo-list">
+              <li>Descargar pedidos desde VTEX.</li>
+              <li>Filtrar por seller <strong>adidas</strong> y la fecha deseada.</li>
+              <li>Copiar los datos y pegarlos en la hoja <span class="instructivo-sheet">Export Vtex</span> de la base de datos.</li>
+              <li>Copiar solo las columnas solicitadas.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- PIM -->
+        <div class="instructivo-step">
+          <div class="instructivo-step-num">2</div>
+          <div class="instructivo-step-body">
+            <h3 class="instructivo-step-title">Export PIM</h3>
+            <ol class="instructivo-list">
+              <li>Ir a <strong>PIM → Reportes → Pedidos → Pedidos por Estado</strong>.</li>
+              <li>Filtrar por depósito, período, tienda <strong>adidas producteca</strong> y la fecha deseada.</li>
+              <li>Ejecutar → Abrir Excel.</li>
+              <li>Copiar los datos y pegarlos en la hoja <span class="instructivo-sheet">Export PIM</span>.</li>
+              <li class="instructivo-alert">Eliminar el prefijo <code class="instructivo-code">VT19-</code> de todos los números de pedido para que coincidan con los de VTEX y TMS.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- TMS -->
+        <div class="instructivo-step">
+          <div class="instructivo-step-num">3</div>
+          <div class="instructivo-step-body">
+            <h3 class="instructivo-step-title">Export TMS</h3>
+            <ol class="instructivo-list">
+              <li>Ingresar a <a class="instructivo-link" href="https://adidas-tms.prodtech.uno/" target="_blank" rel="noopener">adidas-tms.prodtech.uno</a>.</li>
+              <li>Ir a <strong>Seguimiento → Pedidos</strong>.</li>
+              <li>En Filtros: Operación <strong>B2C</strong> y la fecha deseada.</li>
+              <li>Descargar XLSX.</li>
+              <li>Copiar los datos y pegarlos en la hoja <span class="instructivo-sheet">Export TMS</span>.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Actualizar -->
+        <div class="instructivo-step">
+          <div class="instructivo-step-num">4</div>
+          <div class="instructivo-step-body">
+            <h3 class="instructivo-step-title">Actualizar la página</h3>
+            <ol class="instructivo-list">
+              <li>Ir a la pestaña <strong>Pedidos</strong> y hacer clic en <strong>Actualizar datos</strong>.</li>
+              <li>La tabla y la analítica se actualizarán con los datos recién cargados.</li>
+              <li>Usar el botón <strong>? Guía de acciones</strong> para saber qué hacer según cada acción pendiente.</li>
+            </ol>
+          </div>
+        </div>
+
+      </div><!-- /instructivo-steps -->
+    </div><!-- /instructivo-container -->
+  </div><!-- /view-instructivo -->
 
   <!-- Modal guía de acciones -->
   <div id="guide-overlay" class="guide-overlay" onclick="App.closeGuide()" style="display:none">

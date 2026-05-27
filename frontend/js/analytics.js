@@ -5,23 +5,24 @@ App._currentTab = 'operativo';
 
 App.showTab = function (tab) {
   App._currentTab = tab;
-  var viewOp = document.getElementById('view-operativo');
-  var viewAn = document.getElementById('view-analitica');
-  var tabOp  = document.getElementById('tab-operativo');
-  var tabAn  = document.getElementById('tab-analitica');
 
-  if (tab === 'analitica') {
-    if (viewOp) viewOp.style.display = 'none';
-    if (viewAn) viewAn.style.display = 'block';
-    if (tabOp)  tabOp.classList.remove('tab--active');
-    if (tabAn)  tabAn.classList.add('tab--active');
-    App.renderAnalytics();
-  } else {
-    if (viewOp) viewOp.style.display = '';
-    if (viewAn) viewAn.style.display = 'none';
-    if (tabOp)  tabOp.classList.add('tab--active');
-    if (tabAn)  tabAn.classList.remove('tab--active');
-  }
+  var views = {
+    operativo:   document.getElementById('view-operativo'),
+    analitica:   document.getElementById('view-analitica'),
+    instructivo: document.getElementById('view-instructivo')
+  };
+  var tabs = {
+    operativo:   document.getElementById('tab-operativo'),
+    analitica:   document.getElementById('tab-analitica'),
+    instructivo: document.getElementById('tab-instructivo')
+  };
+
+  Object.keys(views).forEach(function (key) {
+    if (views[key]) views[key].style.display = key === tab ? (key === 'operativo' ? '' : 'block') : 'none';
+    if (tabs[key])  tabs[key].classList.toggle('tab--active', key === tab);
+  });
+
+  if (tab === 'analitica') App.renderAnalytics();
 };
 
 App.renderAnalytics = function () {
