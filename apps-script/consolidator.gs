@@ -58,17 +58,17 @@ function consolidateOrders(pimRows, vtexRows, tmsRows) {
 
 /**
  * Formatea un valor de celda de fecha PIM a string "dd/MM/yyyy".
- * Maneja Date objects (Apps Script) y strings de fallback.
+ * Usa JS puro para evitar overhead de servicios Apps Script en loops.
  */
 function formatPimDate(val) {
   if (!val) return '';
-  try {
-    var d = val instanceof Date ? val : new Date(val);
-    if (isNaN(d.getTime())) return trimStr(val);
-    return Utilities.formatDate(d, Session.getScriptTimeZone(), 'dd/MM/yyyy');
-  } catch (e) {
-    return trimStr(val);
+  if (val instanceof Date) {
+    var day   = ('0' + val.getDate()).slice(-2);
+    var month = ('0' + (val.getMonth() + 1)).slice(-2);
+    var year  = val.getFullYear();
+    return day + '/' + month + '/' + year;
   }
+  return trimStr(val);
 }
 
 /**
