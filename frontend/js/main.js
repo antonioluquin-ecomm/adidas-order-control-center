@@ -51,6 +51,7 @@ App.load = function (forceRefresh) {
       App.renderDashboard(meta);
       App.populateActionFilter(meta.byAction || {});
       App.populateDateFilters(App.state.orders);
+      if (App._currentTab === 'analitica') App.renderAnalytics();
       var filtered = App.applyFilters(App.state.orders, App.state.filters);
       App.renderTable(filtered);
       App.updateFilterCount(filtered.length, App.state.orders.length);

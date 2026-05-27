@@ -40,6 +40,15 @@
 
   </header>
 
+  <!-- Tab bar -->
+  <nav id="tab-bar">
+    <button id="tab-operativo" class="tab tab--active" onclick="App.showTab('operativo')">Pedidos</button>
+    <button id="tab-analitica" class="tab" onclick="App.showTab('analitica')">Analítica</button>
+  </nav>
+
+  <!-- Vista operativa -->
+  <div id="view-operativo">
+
   <!-- Warning fuentes vacías (#6) -->
   <div id="source-warnings" class="source-warnings" style="display:none"></div>
 
@@ -124,6 +133,11 @@
     </table>
   </main>
 
+  </div><!-- /view-operativo -->
+
+  <!-- Vista analítica -->
+  <div id="view-analitica" style="display:none"></div>
+
   <!-- Modal guía de acciones -->
   <div id="guide-overlay" class="guide-overlay" onclick="App.closeGuide()" style="display:none">
     <div class="guide-modal" onclick="event.stopPropagation()">
@@ -140,6 +154,7 @@
   <script src="js/table.js"></script>
   <script src="js/filters.js"></script>
   <script src="js/export.js"></script>
+  <script src="js/analytics.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
