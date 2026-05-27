@@ -3,8 +3,9 @@
 // Deploy: Ejecutar como "Yo" — Acceso: "Cualquier usuario"
 // URL resultante → pegar en frontend/js/api.js (App.API_URL)
 
-var CACHE_KEY = 'occ_orders_v2'; // bumpeado al agregar totalAll/sinAccion al contrato
-var CACHE_TTL = 300; // segundos — 5 minutos
+var CACHE_KEY       = 'occ_orders_v3'; // bumpeado al agregar caché en chunks
+var CACHE_TTL       = 300;             // segundos — 5 minutos
+var CACHE_CHUNK_MAX = 90000;           // bytes — bajo el límite de 100 KB de CacheService
 
 /**
  * Punto de entrada HTTP GET.
@@ -18,12 +19,12 @@ function doGet(e) {
     var forceRefresh = e && e.parameter && e.parameter.refresh === '1';
     var cache        = CacheService.getScriptCache();
 
-    // Intentar servir desde caché
+    // Intentar servir desde caché (soporta respuestas > 100 KB via chunks)
     if (!forceRefresh) {
-      var cached = cache.get(CACHE_KEY);
+      var cached = cacheGet(cache, CACHE_KEY);
       if (cached) {
         log('doGet CACHE HIT');
-        return jsonResponse(JSON.parse(cached));
+        return jsonResponse(cached);
       }
     }
 
@@ -39,13 +40,8 @@ function doGet(e) {
     var meta       = buildMeta(allOrders, actionable, sources);
 
     var response = { orders: actionable, meta: meta };
-    var json     = JSON.stringify(response);
 
-    try {
-      cache.put(CACHE_KEY, json, CACHE_TTL);
-    } catch (cacheErr) {
-      log('WARN: respuesta demasiado grande para caché (' + cacheErr.message + ')');
-    }
+    cachePut(cache, CACHE_KEY, response);
 
     log('doGet OK — ' + actionable.length + ' con acción de ' + allOrders.length + ' totales');
     return jsonResponse(response);
@@ -103,4 +99,43 @@ function jsonResponse(data) {
   return ContentService
     .createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ─── Caché en chunks ─────────────────────────────────────────────────────────
+// CacheService limita a 100 KB por key. Dividimos el JSON en trozos de
+// CACHE_CHUNK_MAX bytes y los guardamos bajo keys numeradas.
+
+function cachePut(cache, key, data) {
+  try {
+    var json   = JSON.stringify(data);
+    var chunks = [];
+    for (var i = 0; i < json.length; i += CACHE_CHUNK_MAX) {
+      chunks.push(json.substring(i, i + CACHE_CHUNK_MAX));
+    }
+    for (var j = 0; j < chunks.length; j++) {
+      cache.put(key + '_' + j, chunks[j], CACHE_TTL);
+    }
+    cache.put(key + '_n', String(chunks.length), CACHE_TTL);
+    log('Cache guardado en ' + chunks.length + ' chunk(s) (' + json.length + ' bytes)');
+  } catch (e) {
+    log('WARN: no se pudo guardar en caché — ' + e.message);
+  }
+}
+
+function cacheGet(cache, key) {
+  try {
+    var nStr = cache.get(key + '_n');
+    if (!nStr) return null;
+    var n     = parseInt(nStr, 10);
+    var parts = [];
+    for (var i = 0; i < n; i++) {
+      var part = cache.get(key + '_' + i);
+      if (!part) return null; // algún chunk expiró — recalcular
+      parts.push(part);
+    }
+    return JSON.parse(parts.join(''));
+  } catch (e) {
+    log('WARN: error leyendo caché — ' + e.message);
+    return null;
+  }
 }
